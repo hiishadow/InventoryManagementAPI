@@ -5,7 +5,7 @@ import "time"
 type InventoryService interface {
 	CreateItem(creatingItem CreateItem) (Item, error)
 	GetItemByID(id string) (GetItem, error)
-	UpdateItemByID(id string) (Item, error)
+	UpdateItemByID(id string, updatingItem Item) (Item, error)
 	DeleteItemByID(id string) error
 	// GetAllItemsInLastestMonthByProductName(productName string) ([]GetItem, error)
 	GetProductLastestMonthDataByProductName(productName string) ([]GetItem, ProductData, error)
