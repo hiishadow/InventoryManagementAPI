@@ -1,17 +1,10 @@
 package inventory
 
 import (
+	"errors"
+
 	"github.com/jinzhu/copier"
 )
-
-// type InventoryService interface {
-// 	CreateItem(req CreateItem) (Item, error)
-// 	GetItemByID(id string) (Item, error)
-// 	UpdateItemByID(id string, ) (Item, error)
-// 	DeleteItemByID(id string) error
-// 	GetAllItemsInLastestMonthByProductName(productName string) ([]Item, error)
-// 	GetProductLastestMonthDataByProductName(productName string) ([]Item,ProductData , error)
-// }
 
 type service struct {
 	ItemPostgresRepository ItemPostgresRepository
@@ -21,12 +14,43 @@ func NewInventoryService(repo ItemPostgresRepository) *service {
 	return &service{ItemPostgresRepository: repo}
 }
 
-// func (s *service) CreateItem(creatingItem CreateItem) (Item, error) {
-// 	return s.ItemPostgresRepository.Create(creatingItem)
-// }
+func (s *service) CreateItem(creatingItem CreateItem) (Item, error) {
+	if creatingItem.Status == "SELL" {
+		items, err := s.ItemPostgresRepository.GetAllBeforeDateByProductName(creatingItem.ProductName, creatingItem.At)
+		if err != nil {
+			return Item{}, err
+		}
 
-// func (s *service) GetItemByID(id string) (GetItem, error) {
-// }
+		itemInventory := calculatePNL(items)
+		if creatingItem.Amount > itemInventory.totalQuantity {
+			return Item{}, errors.New("Not enough stock to sell")
+		}
+	}
+	return s.ItemPostgresRepository.Create(creatingItem)
+}
+
+func (s *service) GetItemByID(id string) (GetItem, error) {
+	item, err := s.ItemPostgresRepository.GetByID(id)
+	if err != nil {
+		return GetItem{}, err
+	}
+	var addedPNLItem GetItem
+	if item.Status == "SELL" {
+		items, err := s.ItemPostgresRepository.GetAllBeforeDateByProductName(item.ProductName, item.At)
+		if err != nil {
+			return GetItem{}, err
+		}
+
+		itemInventory := calculatePNL(items)
+		addedPNLItem.PNL = (float64(item.Amount) * item.Price) - (float64(item.Amount) * itemInventory.averageCost)
+	}
+
+	if err := copier.Copy(&addedPNLItem, &item); err != nil {
+		return GetItem{}, err
+	}
+
+	return addedPNLItem, nil
+}
 
 func (s *service) UpdateItemByID(id string, updatingItem Item) (Item, error) {
 	return s.ItemPostgresRepository.UpdateByID(id, updatingItem)
@@ -34,6 +58,15 @@ func (s *service) UpdateItemByID(id string, updatingItem Item) (Item, error) {
 
 func (s *service) DeleteItemByID(id string) error {
 	return s.ItemPostgresRepository.DeleteByID(id)
+}
+
+func (s *service) GetProductLastestMonthDataByProductName(productName string) ([]GetItem, ProductData, error) {
+	items, err := s.ItemPostgresRepository.GetAllInLastestMonthByProductName(productName)
+	if err != nil {
+		return nil, ProductData{}, err
+	}
+	addedPNLItems, productData := addcalculatedPNLToItemsAndGetProductData(items)
+	return addedPNLItems, productData, nil
 }
 
 type ItemInventory struct {

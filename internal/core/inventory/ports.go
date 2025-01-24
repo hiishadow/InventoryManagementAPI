@@ -7,7 +7,7 @@ type InventoryService interface {
 	GetItemByID(id string) (GetItem, error)
 	UpdateItemByID(id string) (Item, error)
 	DeleteItemByID(id string) error
-	GetAllItemsInLastestMonthByProductName(productName string) ([]GetItem, error)
+	// GetAllItemsInLastestMonthByProductName(productName string) ([]GetItem, error)
 	GetProductLastestMonthDataByProductName(productName string) ([]GetItem, ProductData, error)
 }
 
