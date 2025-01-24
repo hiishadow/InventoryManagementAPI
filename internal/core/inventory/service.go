@@ -53,6 +53,17 @@ func (s *service) GetItemByID(id string) (GetItem, error) {
 }
 
 func (s *service) UpdateItemByID(id string, updatingItem UpdateItem) (Item, error) {
+	if updatingItem.Status == "SELL" {
+		items, err := s.ItemPostgresRepository.GetAllBeforeDateByProductName(updatingItem.ProductName, updatingItem.At)
+		if err != nil {
+			return Item{}, err
+		}
+
+		itemInventory := calculatePNL(items)
+		if updatingItem.Amount > itemInventory.totalQuantity {
+			return Item{}, errors.New("Not enough stock to sell")
+		}
+	}
 	return s.ItemPostgresRepository.UpdateByID(id, updatingItem)
 }
 
