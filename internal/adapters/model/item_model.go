@@ -43,7 +43,7 @@ func (s ItemStatus) Value() (driver.Value, error) {
 
 type Item struct {
 	ID          uuid.UUID    `gorm:"primaryKey" json:"id"`
-	ProductName string       `gorm:"not null ;unique" json:"productName"`
+	ProductName string       `gorm:"not null" json:"productName"`
 	Status      ItemStatus   `gorm:"type:item_status;not null" json:"status"`
 	Price       float64      `gorm:"not null" json:"price"`
 	Amount      int          `gorm:"not null" json:"amount"`
