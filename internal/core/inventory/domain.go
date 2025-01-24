@@ -42,6 +42,11 @@ type Item struct {
 	CreateItem
 }
 
+type GetItem struct {
+	Item
+	PNL float64 `json:"PNL"`
+}
+
 type ProductData struct {
 	TotalAmount    int
 	ProductsSold   int

@@ -1,12 +1,14 @@
 package inventory
 
+import "time"
+
 type InventoryService interface {
-	CreateItem(req CreateItem) (Item, error)
-	GetItemByID(id string) (Item, error)
-	UpdateItemByID(id string, ) (Item, error)
+	CreateItem(creatingItem CreateItem) (Item, error)
+	GetItemByID(id string) (GetItem, error)
+	UpdateItemByID(id string) (Item, error)
 	DeleteItemByID(id string) error
-	GetAllItemsInLastestMonthByProductName(productName string) ([]Item, error)
-	GetProductLastestMonthDataByProductName(productName string) ([]Item,ProductData , error)
+	GetAllItemsInLastestMonthByProductName(productName string) ([]GetItem, error)
+	GetProductLastestMonthDataByProductName(productName string) ([]GetItem, ProductData, error)
 }
 
 type ItemPostgresRepository interface {
@@ -15,4 +17,5 @@ type ItemPostgresRepository interface {
 	UpdateByID(id string, updatingItem Item) (Item, error)
 	DeleteByID(id string) error
 	GetAllInLastestMonthByProductName(productName string) ([]Item, error)
+	GetAllBeforeDateByProductName(productName string, date time.Time) ([]Item, error)
 }
