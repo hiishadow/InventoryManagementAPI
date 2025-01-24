@@ -16,17 +16,17 @@ const (
 type CreateItemRequest struct {
 	ProductName string     `json:"productName" validate:"required"`
 	Status      ItemStatus `json:"status" validate:"required,oneof=BUY SELL"`
-	Price       float64    `json:"price" validate:"required"`
-	Amount      int        `json:"amount" validate:"required"`
+	Price       float64    `json:"price" validate:"required,gte=0"`
+	Amount      int        `json:"amount" validate:"required,gte=0"`
 	At          string     `json:"at" validate:"required"`
 }
 
 type UpdateItemRequest struct {
-	ProductName string     `json:"productName"`
+	ProductName string     `json:"productName" `
 	Status      ItemStatus `json:"status" validate:"oneof=BUY SELL"`
-	Price       float64    `json:"price"`
-	Amount      int        `json:"amount"`
-	At          string     `json:"at"`
+	Price       float64    `json:"price" validate:"gte=0"`
+	Amount      int        `json:"amount" validate:"gte=0"`
+	At          string     `json:"at" `
 }
 
 type CreateItem struct {
@@ -36,6 +36,8 @@ type CreateItem struct {
 	Amount      int
 	At          time.Time
 }
+
+type UpdateItem = CreateItem
 
 type Item struct {
 	ID uuid.UUID

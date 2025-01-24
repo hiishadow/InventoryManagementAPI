@@ -63,7 +63,7 @@ func (r *repository) GetByID(id string) (inventory.Item, error) {
 	return getItem, nil
 }
 
-func (r *repository) UpdateByID(id string, updatingItem inventory.Item) (inventory.Item, error) {
+func (r *repository) UpdateByID(id string, updatingItem inventory.UpdateItem) (inventory.Item, error) {
 	var itemModel model.Item
 	if err := r.DB.Where("id = ?", id).First(&itemModel).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
@@ -76,7 +76,7 @@ func (r *repository) UpdateByID(id string, updatingItem inventory.Item) (invento
 		return inventory.Item{}, err
 	}
 
-	if err := r.DB.Model(&itemModel).Updates(itemModel).Error; err != nil {
+	if err := r.DB.Model(&itemModel).Where("id = ?", id).Updates(itemModel).Error; err != nil {
 		return inventory.Item{}, err
 	}
 

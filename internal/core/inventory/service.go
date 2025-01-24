@@ -52,7 +52,7 @@ func (s *service) GetItemByID(id string) (GetItem, error) {
 	return addedPNLItem, nil
 }
 
-func (s *service) UpdateItemByID(id string, updatingItem Item) (Item, error) {
+func (s *service) UpdateItemByID(id string, updatingItem UpdateItem) (Item, error) {
 	return s.ItemPostgresRepository.UpdateByID(id, updatingItem)
 }
 
